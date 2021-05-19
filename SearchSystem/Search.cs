@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WordNetClasses;
 
 namespace SearchSystem
 {
@@ -12,20 +13,60 @@ namespace SearchSystem
         string dateStartString;
         string dateEndString;
         string searchQuery;
+        Dictionary<int, double> sqVect = null;
 
-        Dictionary<int, double> getSearchQueryVector(string query, Dictionary<int, double> docVector)
+        public Search(string query, string dateStart = null, string dateEnd = null)
         {
-            return new Dictionary<int, double>();
+            searchQuery = query;
+            dateStartString = dateStart;
+            dateEndString = dateEnd;
         }
 
-        double scalarProduct(Dictionary<int, double> val)
+        public double scalarProduct(Dictionary<int, double> docVector)
         {
-            return 0;
+            if (this.sqVect == null) this.sqVect = this.getSearchQueryVector();
+
+            double result = 0.0d;
+
+            foreach(var searchDocWeight in sqVect)
+            {
+                foreach(var docWeight in docVector)
+                {
+                    if (docWeight.Key == searchDocWeight.Key)
+                    {
+                        result += docWeight.Value * searchDocWeight.Value;
+                    }
+                }
+            }
+            result /= euclidNorm(docVector);
+
+            return result;
         }
 
-        double euclidNorm(Dictionary<int, double> val)
+        protected Dictionary<int, double> getSearchQueryVector()
         {
-            return 0;
+            Dictionary<int, double> result = new Dictionary<int, double>();
+            List<Word> lemmas = DbConn.getInstance().getWordObjectsForLemms(Parser.getAllLemms(this.searchQuery));
+
+            foreach(var lem in lemmas)
+            {
+                result.Add(lem.id, 1.0d);
+            }
+
+            return result;
+        }
+
+        protected double euclidNorm(Dictionary<int, double> docVector)
+        {
+            double result = 0.0d;
+
+            foreach(var wordWeight in docVector)
+            {
+                result += Math.Pow(wordWeight.Value, 2);
+            }
+            result = Math.Sqrt(result);
+
+            return result;
         }
 
        /* IOrderedEnumerable <SearchResult> getSearchResult()

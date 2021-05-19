@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -14,9 +15,13 @@ namespace SearchSystem
         [STAThread]
         static void Main()
         {
+
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Form1 main = new Form1();
+            main.Shown += new EventHandler(main.onFormLoad);
+            Application.Run(main);
         }
     }
 }
