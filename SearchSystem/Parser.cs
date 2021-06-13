@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DeepMorphy;
 
 namespace SearchSystem
 {
@@ -38,10 +39,12 @@ namespace SearchSystem
             return stB.ToString();
         }
 
-        public static string[] getAllLemms(string text)
+        public static DeepMorphy.Model.MorphInfo[] getAllLemms(string text)
         {
             string[] separators = { ",", ".", "!", "?", ";", ":", " ", "(", ")", "[", "]", "\"", "\'", "-", "–", "—", "»", "«", "•", "{", "}" };
-            return text.ToLower().Split(separators, StringSplitOptions.RemoveEmptyEntries);
+            var words = text.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+            MorphAnalyzer MA = new MorphAnalyzer(withLemmatization: true, withTrimAndLower: true);
+            return MA.Parse(words).ToArray();     
         }
     }
 }

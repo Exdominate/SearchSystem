@@ -27,5 +27,17 @@ namespace SearchSystem
 
             return clone.DefaultView;
         }
+
+        public static void ReduceRows(this DataTable table)
+        {
+            const int searchTextLength = 300;
+            int titleLength;
+
+            foreach (DataRow row in table.Rows)
+            {
+                titleLength = row["title"].ToString().Length;
+                row["text"] = row["text"].ToString().Substring(titleLength, titleLength + searchTextLength) + "...";
+            }
+        }
     }
 }

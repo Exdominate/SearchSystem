@@ -14,9 +14,7 @@ namespace SearchSystem
         /// </summary>
         [STAThread]
         static void Main()
-        {
-
-
+        {      
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Form1 main = new Form1();

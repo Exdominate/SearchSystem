@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using System.IO;
 using Microsoft.AspNetCore.Mvc;
 
-//"https://en.wikipedia.org/wiki/List_of_programmers";
 namespace SearchSystem
 {
     class Crawler
@@ -41,7 +40,6 @@ namespace SearchSystem
             HttpClient client = new HttpClient();
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             client.DefaultRequestHeaders.Accept.Clear();
-            //client.DefaultRequestHeaders.ConnectionClose = true;
             var webRequest = new HttpRequestMessage(HttpMethod.Get, fullUrl);
             var response = client.GetStringAsync(fullUrl);
             return response;

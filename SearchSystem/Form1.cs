@@ -12,6 +12,8 @@ using Npgsql;
 
 namespace SearchSystem
 {
+    
+
     public partial class Form1 : Form
     {
         private DataSet ds = new DataSet();
@@ -34,6 +36,7 @@ namespace SearchSystem
             ds.Reset();
             da.Fill(ds);
             dt = ds.Tables[0];
+            dt.ReduceRows();
 
             dataGridView1.DataSource = dt.DefaultView;
             dataGridView1.Columns[4].Visible = false;
@@ -69,7 +72,7 @@ namespace SearchSystem
             label1.Refresh();
         }        
 
-        private void button1_Click(object sender, EventArgs e)
+        private void search_Click(object sender, EventArgs e)
         {            
             if (!Word.isCollectionUpToDate())
             {
@@ -83,10 +86,12 @@ namespace SearchSystem
             List < Document > docs = DbConn.getInstance().GetAllFromDoc();
             Dictionary<int, double> relevation = new Dictionary<int, double>();
 
+            double curRelevation;
             foreach(Document doc in docs)
             {
-                relevation.Add(doc.documentID, searchQuery.scalarProduct(Document.getDocumentVector(doc.documentID)));
-                count++;
+                curRelevation = searchQuery.scalarProduct(Document.getDocumentVector(doc.documentID));
+                relevation.Add(doc.documentID, curRelevation);
+                if (curRelevation != 0) count++;
             }
             
             dataGridView1.DataSource = dt.ApplySort((r1, r2) =>
@@ -103,19 +108,14 @@ namespace SearchSystem
             this.setStatus("поиск окончен", Color.ForestGreen);
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void loadCollection_Click(object sender, EventArgs e)
         {
             this.setStatus("загрузка", Color.Orange);
             Word.setWordsCollection(DbConn.getInstance().getAllWords());
             this.setStatus("загружено", Color.ForestGreen);
         }
 
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
-        private void button3_Click(object sender, EventArgs e)
+        private void loadIndex_Click(object sender, EventArgs e)
         {
             this.setStatus("загрузка данных из интернета...", Color.Orange);
             List<Document> docs;
@@ -132,10 +132,11 @@ namespace SearchSystem
 
             docs.ForEach(doc =>
             {
-                string[] docLemms = Parser.getAllLemms(doc.text);
+                DeepMorphy.Model.MorphInfo[] docLemms = Parser.getAllLemms(doc.text);
 
-                foreach (var lem in docLemms)
+                foreach (var lemInfo in docLemms)
                 {
+                    string lem = lemInfo.BestTag.Lemma != null ? lemInfo.BestTag.Lemma : lemInfo.Text;                    
                     if (uniqueLemms.Add(lem))
                     {
                         lemmsObjs.Add(lem, new Word(lem, doc.documentID));

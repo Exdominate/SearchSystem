@@ -46,8 +46,15 @@ namespace SearchSystem
         protected Dictionary<int, double> getSearchQueryVector()
         {
             Dictionary<int, double> result = new Dictionary<int, double>();
-            List<Word> lemmas = DbConn.getInstance().getWordObjectsForLemms(Parser.getAllLemms(this.searchQuery));
+            HashSet<string> uniqueWords = new HashSet<string>();
 
+            DeepMorphy.Model.MorphInfo[] searchInfo = Parser.getAllLemms(this.searchQuery);            
+            foreach (var lemmInfo in searchInfo)
+            {
+                uniqueWords.Add(lemmInfo.BestTag.Lemma);
+            }
+            
+            List<Word> lemmas = DbConn.getInstance().getWordObjectsForLemms(uniqueWords.ToArray<string>());
             foreach(var lem in lemmas)
             {
                 result.Add(lem.id, 1.0d);
