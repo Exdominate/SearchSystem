@@ -1,26 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Threading.Tasks;
 using Npgsql;
-using NodaTime;
-using SearchSystem.Properties;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
+using System.IO;
+using System.Windows.Forms;
 
 namespace SearchSystem
 {    
     class DbConn    
     {
         private static DbConn db = null;
-
-        // Obtain connection string information from the portal
-        private static string Host = "127.0.0.1";
-        private static string User = "postgres";
-        private static string DBname = "SearchSystem";
-        private static string Password = Resources.password;
-        private static string Port = "5432";
         private NpgsqlConnection conn;
 
         public static DbConn getInstance()
@@ -34,15 +24,29 @@ namespace SearchSystem
 
         private DbConn()
         {
+            string yaml;
+            using (FileStream fstream = File.OpenRead(Application.StartupPath + "\\db.yaml"))
+            {
+                byte[] array = new byte[fstream.Length];
+                fstream.Read(array, 0, array.Length);
+                yaml = System.Text.Encoding.Default.GetString(array);
+            }
+
+            var deserializer = new DeserializerBuilder()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .Build();
+
+            var p = deserializer.Deserialize<dbAuth>(yaml);
+
             // Build connection string using parameters from portal
             string connString =
                 String.Format(
                     "Server={0};Username={1};Database={2};Port={3};Password={4};SSLMode=Prefer",
-                    Host,
-                    User,
-                    DBname,
-                    Port,
-                    Password);
+                    p.host,
+                    p.user,
+                    p.dbName,
+                    p.port,
+                    p.password);
 
 
             this.conn = new NpgsqlConnection(connString);
@@ -66,11 +70,6 @@ namespace SearchSystem
                 {
                     while (reader.Read())
                     {
-                        /*Console.WriteLine(reader.GetInt32(reader.GetOrdinal("documentid")));
-                        Console.WriteLine(reader.GetFieldValue<DateTime>(reader.GetOrdinal("datetime")));
-                        Console.WriteLine(reader.GetString(reader.GetOrdinal("text")));
-                        Console.WriteLine(reader.GetString(reader.GetOrdinal("title")));
-                        Console.WriteLine(reader.GetString(reader.GetOrdinal("link")));*/
                         var id = reader.GetInt32(reader.GetOrdinal("documentid"));
                         var datetime = reader.GetFieldValue<DateTime>(reader.GetOrdinal("datetime")).ToString();
                         var text = reader.GetString(reader.GetOrdinal("text"));

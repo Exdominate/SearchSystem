@@ -1,0 +1,11 @@
+English
+WARNING!!! it is just an example file. Modify it and move it in the same folder with *.exe file.
+Do not forget to delete this WARNING message and rename file like "db.yaml"!!!
+Русский
+Внимание!!! это файл примера. Измените под себя, поместите в папку с *.exe.
+Не забудьте удалить строчки предупреждения и переименовать файл в "db.yaml"!!!
+host : 127.0.0.1
+user : postgres
+dbName : DBname
+password : password
+port : 5432

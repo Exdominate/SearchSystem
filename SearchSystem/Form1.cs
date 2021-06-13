@@ -29,6 +29,22 @@ namespace SearchSystem
                 
         }
 
+        private void setOptionsDataGridView1()
+        {
+            dataGridView1.Columns[4].Visible = false;
+            dataGridView1.Columns[0].HeaderText = "Название";
+            dataGridView1.Columns[1].HeaderText = "Ссылка";
+            dataGridView1.Columns[2].HeaderText = "Текст";
+            dataGridView1.Columns[3].HeaderText = "Дата";
+            dataGridView1.Columns[0].Width = 100;
+            dataGridView1.Columns[3].Width = 80;
+            dataGridView1.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
+            dataGridView1.Columns[2].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            dataGridView1.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
+            dataGridView1.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+            dataGridView1.RowHeadersVisible = false;
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {            
             string cmd = ("SELECT title, link, text, datetime, documentid FROM ss.documents");
@@ -39,24 +55,19 @@ namespace SearchSystem
             dt.ReduceRows();
 
             dataGridView1.DataSource = dt.DefaultView;
-            dataGridView1.Columns[4].Visible = false;
-            dataGridView1.Columns[0].HeaderText = "Название";
-            dataGridView1.Columns[1].HeaderText = "Ссылка";
-            dataGridView1.Columns[2].HeaderText = "Текст";
-            dataGridView1.Columns[3].HeaderText = "Дата";            
-            dataGridView1.Columns[0].Width = 100;
-            dataGridView1.Columns[3].Width = 80;
-            dataGridView1.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
-            dataGridView1.Columns[2].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            dataGridView1.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
-            dataGridView1.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
-            dataGridView1.RowHeadersVisible = false;
+            setOptionsDataGridView1();
             HideIrrelevantRows(20);
             this.setStatus("Запущено", Color.ForestGreen);
         }
 
         private void HideIrrelevantRows(int count)
         {
+            if (count == 0)
+            {
+                dataGridView1.DataSource = null;                
+                return;
+            }
+
             int i = 0;
             foreach (DataGridViewRow row in dataGridView1.Rows)
             {
@@ -101,8 +112,8 @@ namespace SearchSystem
                 return val2.CompareTo(val1);
             });
 
-            HideIrrelevantRows(count);
-            dataGridView1.Columns[4].Visible = false;
+            setOptionsDataGridView1();
+            HideIrrelevantRows(count);            
             dataGridView1.Update();
             dataGridView1.Refresh();
             this.setStatus("поиск окончен", Color.ForestGreen);
