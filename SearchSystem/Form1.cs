@@ -12,8 +12,6 @@ using Npgsql;
 
 namespace SearchSystem
 {
-    
-
     public partial class Form1 : Form
     {
         private DataSet ds = new DataSet();
@@ -22,6 +20,26 @@ namespace SearchSystem
         public Form1()
         {
             InitializeComponent();
+
+            ToolStripMenuItem help = new ToolStripMenuItem("Помощь");
+            var iOrder = help.DropDownItems.Add("Порядок установки");
+            var iInstr = help.DropDownItems.Add("Инструкция по работе");            
+            iOrder.Click += new System.EventHandler(this.installationOrderWindow);
+            iInstr.Click += new System.EventHandler(this.instructionWindow);
+            //aboutItem.Click += aboutItem_Click;
+            menuStrip1.Items.Add(help);
+        }
+
+        public void installationOrderWindow(object sender, EventArgs e)
+        {
+            InstallationOrder IOwindow = new InstallationOrder();
+            IOwindow.Show();
+        }
+
+        public void instructionWindow(object sender, EventArgs e)
+        {
+            Instruction Iwindow = new Instruction();
+            Iwindow.Show();
         }
 
         public void onFormLoad(object sender, EventArgs e)
@@ -174,6 +192,11 @@ namespace SearchSystem
                 DbConn.getInstance().insertWordRefs(lOb.Value);
             }
             this.setStatus("загрузка завершена", Color.ForestGreen);
+        }
+
+        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
         }
     }
 }
